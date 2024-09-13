@@ -6,14 +6,36 @@ const date = new Date();
 
 export default function App() {
   const [tasks, setTasks] = useState([]);
+  const [lists, setLists] = useState([]);
 
   function handleSubmit(task) {
-    setTasks(() => [...tasks, task]);
+    const newTask = {
+      id: crypto.randomUUID(),
+      name: task,
+      isCompleted: false,
+      createdAt: Date.now(),
+    };
+    setTasks(() => [...tasks, newTask]);
+  }
+  function handleCompleteTask(id) {
+    setTasks((tasks) =>
+      tasks.map((task) =>
+        task.id === id ? { ...task, isCompleted: !task.isCompleted } : task
+      )
+    );
+  }
+  function handleRemovingTask(id) {
+    setTasks((tasks) => tasks.filter((task) => task.id !== id));
   }
   return (
     <div className="App">
       <NavBar />
-      <Main handleSubmit={handleSubmit} tasks={tasks} />
+      <Main
+        handleSubmit={handleSubmit}
+        tasks={tasks}
+        handleCompleteTask={handleCompleteTask}
+        handleRemovingTask={handleRemovingTask}
+      />
       <Actions />
     </div>
   );
@@ -62,17 +84,34 @@ function NavListItem({ onClick, isActive }) {
   );
 }
 
-function Main({ handleSubmit, tasks }) {
+function Main({ handleSubmit, tasks, handleCompleteTask, handleRemovingTask }) {
   return (
     <div className="main">
       <WelcomeMessage />
       <Form handleSubmit={handleSubmit} />
-      <TaskList tasks={tasks} />{" "}
+      <TaskList
+        tasks={tasks}
+        handleCompleteTask={handleCompleteTask}
+        handleRemovingTask={handleRemovingTask}
+      />{" "}
     </div>
   );
 }
 
 function WelcomeMessage() {
+  const hours = date.getHours();
+  let greeting;
+
+  if (hours >= 5 && hours <= 12) {
+    greeting = "Good Morning.";
+  } else if (hours >= 13 && hours <= 18) {
+    greeting = "Good Afternoon.";
+  } else if (hours >= 19 && hours <= 24) {
+    greeting = "Good Evening.";
+  } else {
+    greeting = "Good Night.";
+  }
+
   return (
     <div className="welcome-message">
       <div className="welcome-day">
@@ -80,15 +119,7 @@ function WelcomeMessage() {
         <span className="weekday">{date.getDate()}</span>
       </div>
       <div className="welcome-container">
-        <h2 className="welcome-text">
-          {date.getHours() >= 5 && date.getHours() <= 12 ? "Good Morning." : ""}
-          {date.getHours() >= 13 && date.getHours() <= 18
-            ? "Good Afternoon."
-            : ""}
-          {date.getHours() >= 19 && date.getHours() <= 24
-            ? "Good Evening."
-            : "Good Night"}
-        </h2>
+        <h2 className="welcome-text">{greeting}</h2>
         <p className="welcome-question">What's your plan for today?</p>
       </div>
     </div>
@@ -115,20 +146,36 @@ function Form({ handleSubmit }) {
   );
 }
 
-function TaskList({ tasks }) {
+function TaskList({ tasks, handleCompleteTask, handleRemovingTask }) {
   return (
     <ul className="task-list">
-      {tasks.map((_, i) => (
-        <TaskListItem key={i} />
+      {tasks.map((task, i) => (
+        <TaskListItem
+          task={task}
+          key={i}
+          handleCompleteTask={handleCompleteTask}
+          handleRemovingTask={handleRemovingTask}
+        />
       ))}
     </ul>
   );
 }
 
-function TaskListItem() {
+function TaskListItem({ task, handleCompleteTask, handleRemovingTask }) {
   return (
     <li>
-      <div>siema</div>
+      <div className="task-left">
+        <button
+          onClick={() => handleCompleteTask(task.id)}
+          className="task-complete"
+          style={{ backgroundColor: task.isCompleted && "#101213" }}
+        ></button>{" "}
+        <span>{task.name}</span>{" "}
+      </div>
+      <button
+        className="task-remove"
+        onClick={() => handleRemovingTask(task.id)}
+      ></button>
     </li>
   );
 }
