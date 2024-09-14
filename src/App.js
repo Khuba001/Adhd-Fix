@@ -1,51 +1,161 @@
 import { useState } from "react";
 
-const days = ["day", "work"];
-
 const date = new Date();
 
 export default function App() {
-  const [tasks, setTasks] = useState([]);
   const [lists, setLists] = useState([]);
+  const [activeList, setActiveList] = useState(null);
 
   function handleSubmit(task) {
+    if (!activeList) return;
+
     const newTask = {
       id: crypto.randomUUID(),
       name: task,
       isCompleted: false,
       createdAt: Date.now(),
     };
-    setTasks(() => [...tasks, newTask]);
+    setLists((lists) => {
+      const updatedLists = lists.map((list) =>
+        list.id === activeList.id
+          ? { ...list, tasksArr: [...list.tasksArr, newTask] }
+          : list
+      );
+
+      const updatedActiveList = updatedLists.find(
+        (list) => list.id === activeList.id
+      );
+      setActiveList(updatedActiveList);
+
+      return updatedLists;
+    });
   }
   function handleCompleteTask(id) {
-    setTasks((tasks) =>
-      tasks.map((task) =>
-        task.id === id ? { ...task, isCompleted: !task.isCompleted } : task
-      )
-    );
+    setLists((lists) => {
+      const updatedLists = lists.map((list) =>
+        list.id === activeList.id
+          ? {
+              ...list,
+              tasksArr: list.tasksArr.map((task) =>
+                task.id === id
+                  ? { ...task, isCompleted: !task.isCompleted }
+                  : task
+              ),
+            }
+          : list
+      );
+
+      // Aktualizuj activeList
+      const updatedActiveList = updatedLists.find(
+        (list) => list.id === activeList.id
+      );
+      setActiveList(updatedActiveList);
+
+      return updatedLists;
+    });
   }
+
   function handleRemovingTask(id) {
-    setTasks((tasks) => tasks.filter((task) => task.id !== id));
+    setLists((lists) => {
+      const updatedLists = lists.map((list) =>
+        list.id === activeList.id
+          ? {
+              ...list,
+              tasksArr: list.tasksArr.filter((task) => task.id !== id),
+            }
+          : list
+      );
+
+      // Aktualizuj activeList
+      const updatedActiveList = updatedLists.find(
+        (list) => list.id === activeList.id
+      );
+      setActiveList(updatedActiveList);
+
+      return updatedLists;
+    });
   }
+
+  function handleAddingList(list) {
+    const newList = {
+      id: crypto.randomUUID(),
+      name: list,
+      createdAt: Date.now(),
+      tasksArr: [],
+    };
+    setLists(() => [...lists, newList]);
+  }
+
+  function handleDeletingList(id) {
+    setLists((lists) => lists.filter((list) => list.id !== id));
+    setActiveList(null);
+  }
+
   return (
     <div className="App">
-      <NavBar />
+      <NavBar
+        handleAddingList={handleAddingList}
+        lists={lists}
+        handleDeletingList={handleDeletingList}
+        activeList={activeList}
+        setActiveList={setActiveList}
+      />
       <Main
         handleSubmit={handleSubmit}
-        tasks={tasks}
         handleCompleteTask={handleCompleteTask}
         handleRemovingTask={handleRemovingTask}
+        tasks={activeList ? activeList.tasksArr : []}
       />
       <Actions />
     </div>
   );
 }
 
-function NavBar() {
+function NavBar({
+  handleAddingList,
+  lists,
+  handleDeletingList,
+  activeList,
+  setActiveList,
+}) {
+  const [open, setOpen] = useState(true);
+  const [list, setList] = useState("");
+
+  function onSubmitList(e) {
+    e.preventDefault();
+    handleAddingList(list);
+    setList("");
+    setOpen(false);
+  }
+
   return (
     <nav className="nav-bar">
       <Logo />
-      <NavList />
+      <div className="center">
+        <button
+          onClick={() => setOpen(!open)}
+          className={`add-list ${open && "active"}`}
+        >
+          +
+        </button>
+      </div>
+      {open && (
+        <form onSubmit={(e) => onSubmitList(e)} className="form-list">
+          <input
+            value={list}
+            onChange={(e) => setList(e.target.value)}
+            type="text"
+            placeholder="Enter list name..."
+          />
+          <button type="submit">X</button>
+        </form>
+      )}
+      <NavList
+        lists={lists}
+        handleDeletingList={handleDeletingList}
+        setActiveList={setActiveList}
+        activeList={activeList}
+      />
     </nav>
   );
 }
@@ -54,20 +164,18 @@ function Logo() {
   return <img src="logoNav.png" alt="App logo"></img>;
 }
 
-function NavList() {
-  const [activeIndex, setActiveIndex] = useState(null);
-  function handleClick(index) {
-    setActiveIndex(index);
-  }
+function NavList({ lists, handleDeletingList, setActiveList, activeList }) {
   return (
     <div className="nav-list-container">
       <h3>My Lists:</h3>
       <ul className="nav-list">
-        {days.map((_, i) => (
+        {lists.map((list, i) => (
           <NavListItem
-            isActive={i === activeIndex}
-            onClick={() => handleClick(i)}
-            key={days[i]}
+            setActiveList={setActiveList}
+            handleDeletingList={handleDeletingList}
+            lists={list}
+            isActive={activeList && activeList.id === list.id}
+            key={list.id}
           />
         ))}
       </ul>
@@ -75,16 +183,18 @@ function NavList() {
   );
 }
 
-function NavListItem({ onClick, isActive }) {
+function NavListItem({ isActive, lists, handleDeletingList, setActiveList }) {
   return (
     <li className={`nav-list-item ${isActive ? "active" : ""}`}>
-      <button onClick={onClick}>Siema</button>
-      {isActive ? <p>X</p> : ""}
+      <button onClick={() => setActiveList(lists)}>{lists.name}</button>
+      {isActive ? <p onClick={() => handleDeletingList(lists.id)}>X</p> : ""}
     </li>
   );
 }
 
-function Main({ handleSubmit, tasks, handleCompleteTask, handleRemovingTask }) {
+// MAIN PAGE
+
+function Main({ handleSubmit, handleCompleteTask, handleRemovingTask, tasks }) {
   return (
     <div className="main">
       <WelcomeMessage />
@@ -146,13 +256,13 @@ function Form({ handleSubmit }) {
   );
 }
 
-function TaskList({ tasks, handleCompleteTask, handleRemovingTask }) {
+function TaskList({ handleCompleteTask, handleRemovingTask, tasks }) {
   return (
     <ul className="task-list">
       {tasks.map((task, i) => (
         <TaskListItem
           task={task}
-          key={i}
+          key={task.id}
           handleCompleteTask={handleCompleteTask}
           handleRemovingTask={handleRemovingTask}
         />

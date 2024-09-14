@@ -30,6 +30,58 @@ body {
   background-color: #212529;
   padding: 0 2rem;
 }
+
+.add-list {
+  width: 4.2rem;
+  height: 4.2rem;
+  border-radius: 10px;
+  border: none;
+  font-size: 3.2rem;
+  margin-bottom: 2rem;
+  cursor: pointer;
+
+  transition: all 0.3s;
+}
+
+.add-list:hover {
+  background-color: #f76f6a;
+  transform: scale(110%);
+  color: #fff;
+}
+.add-list.active {
+  background-color: #f76f6a;
+  color: #fff;
+}
+.form-list {
+  display: flex;
+  align-content: center;
+  justify-content: center;
+  margin-bottom: 2rem;
+}
+
+.form-list input {
+  padding: 1rem 0.5rem;
+  font-weight: 600;
+  width: 90%;
+  font-size: 1.6rem;
+  border: none;
+  border-radius: 5px;
+  background-color: #101213;
+  color: #fff;
+}
+.form-list input:focus {
+  color: #f76f6a;
+}
+.form-list button {
+  display: none;
+}
+
+.center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .nav-list-container {
   font-size: 1.6rem;
   display: flex;
