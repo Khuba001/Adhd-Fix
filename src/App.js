@@ -1,3 +1,11 @@
+import {
+  eachDayOfInterval,
+  endOfMonth,
+  format,
+  getYear,
+  startOfMonth,
+  startOfToday,
+} from "date-fns";
 import { useState } from "react";
 
 const date = new Date();
@@ -291,5 +299,65 @@ function TaskListItem({ task, handleCompleteTask, handleRemovingTask }) {
 }
 
 function Actions() {
-  return <div className="actions">siema</div>;
+  return (
+    <div className="actions">
+      <CalendarDate />
+      <Calendar />
+    </div>
+  );
+}
+function CalendarDate() {
+  let year = getYear(date);
+  let month = date.toDateString().split(" ")[1];
+  return (
+    <div className="calendar-date">
+      <span className="calendar-year">{year}</span>
+      <span className="calendar-month">{month}</span>
+      <button className="calendar-button--left">lewo</button>
+      <button className="calendar-button--right">prawo</button>
+    </div>
+  );
+}
+
+function Calendar() {
+  let today = startOfToday();
+
+  let days = eachDayOfInterval({
+    start: startOfMonth(today),
+    end: endOfMonth(today),
+  });
+
+  return (
+    <>
+      <div className="calendar-weekdays">
+        <span>M</span>
+        <span>T</span>
+        <span>W</span>
+        <span>T</span>
+        <span>F</span>
+        <span>S</span>
+        <span>S</span>
+      </div>
+      <div className="calendar">
+        {days.map((day, i) => (
+          <CalendarDay day={day} key={i} today={today} />
+        ))}
+      </div>
+    </>
+  );
+}
+
+function CalendarDay({ day, today }) {
+  console.log(today === day && "siema");
+  return (
+    <div
+      className={
+        day.getTime() === today.getTime()
+          ? "calendar-day active"
+          : "calendar-day"
+      }
+    >
+      {format(day, "d")}
+    </div>
+  );
 }

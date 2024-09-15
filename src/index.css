@@ -231,3 +231,81 @@ body {
 .task-list li .task-left button:hover {
   background-color: #101213;
 }
+
+.actions {
+  padding: 6rem 0;
+}
+
+.calendar-date {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  position: relative;
+
+  margin-bottom: 4rem;
+}
+
+.calendar-year,
+.calendar-month {
+  font-size: 2rem;
+  font-weight: 600;
+}
+
+.calendar-date button {
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 3.2rem;
+  height: 3.2rem;
+  border-radius: 9px;
+  padding: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.calendar-button--left {
+  position: absolute;
+  left: 30%;
+}
+.calendar-button--right {
+  position: absolute;
+  right: 30%;
+}
+
+.calendar {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  justify-items: center;
+  text-align: center;
+  row-gap: 2.4rem;
+  padding: 2rem;
+}
+
+.calendar-weekdays {
+  display: flex;
+  gap: 2rem;
+  align-items: center;
+  justify-content: center;
+  padding: 0 2rem;
+}
+
+.calendar-weekdays span {
+  font-size: 1.6rem;
+  padding: 1rem;
+  font-weight: 600;
+}
+
+.calendar-day {
+  font-size: 1.6rem;
+  padding: 1rem;
+}
+
+.calendar-day.active {
+  background-color: #f76f6a;
+  padding: 1rem;
+  border-radius: 50%;
+  font-weight: 700;
+}
