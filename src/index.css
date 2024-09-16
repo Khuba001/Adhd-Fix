@@ -255,24 +255,30 @@ body {
 
 .calendar-date button {
   border: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 3.2rem;
-  height: 3.2rem;
+  background-color: #212529;
   border-radius: 9px;
-  padding: 1rem;
   font-weight: 600;
   cursor: pointer;
+
+  transition: all 0.3s;
 }
 
 .calendar-button--left {
   position: absolute;
-  left: 30%;
+  font-size: 2rem;
+  left: 35%;
+  color: #fff;
 }
 .calendar-button--right {
   position: absolute;
-  right: 30%;
+  font-size: 2rem;
+  right: 35%;
+  color: #fff;
+}
+
+.calendar-date button:hover {
+  color: #f76f6a;
+  transform: scale(120%);
 }
 
 .calendar {

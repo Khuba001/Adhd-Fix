@@ -1,12 +1,14 @@
 import {
   eachDayOfInterval,
   endOfMonth,
+  endOfWeek,
   format,
   getYear,
   startOfMonth,
   startOfToday,
 } from "date-fns";
 import { useState } from "react";
+import { FaCaretLeft, FaCaretRight } from "react-icons/fa";
 
 const date = new Date();
 
@@ -313,18 +315,23 @@ function CalendarDate() {
     <div className="calendar-date">
       <span className="calendar-year">{year}</span>
       <span className="calendar-month">{month}</span>
-      <button className="calendar-button--left">lewo</button>
-      <button className="calendar-button--right">prawo</button>
+      <button className="calendar-button--left">
+        <FaCaretLeft />
+      </button>
+      <button className="calendar-button--right">
+        <FaCaretRight />
+      </button>
     </div>
   );
 }
 
 function Calendar() {
   let today = startOfToday();
+  const [selectedDay, setSelectedDay] = useState(today);
 
   let days = eachDayOfInterval({
     start: startOfMonth(today),
-    end: endOfMonth(today),
+    end: endOfWeek(endOfMonth(today)),
   });
 
   return (
@@ -340,15 +347,19 @@ function Calendar() {
       </div>
       <div className="calendar">
         {days.map((day, i) => (
-          <CalendarDay day={day} key={i} today={today} />
+          <CalendarDay
+            day={day}
+            key={i}
+            today={today}
+            selectedDay={selectedDay}
+          />
         ))}
       </div>
     </>
   );
 }
 
-function CalendarDay({ day, today }) {
-  console.log(today === day && "siema");
+function CalendarDay({ day, today, selectedDay }) {
   return (
     <div
       className={
