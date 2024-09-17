@@ -247,8 +247,7 @@ body {
   margin-bottom: 4rem;
 }
 
-.calendar-year,
-.calendar-month {
+.calendar-month-year {
   font-size: 2rem;
   font-weight: 600;
 }
@@ -266,14 +265,16 @@ body {
 .calendar-button--left {
   position: absolute;
   font-size: 2rem;
-  left: 35%;
+  left: 30%;
   color: #fff;
+  transform: translateY(10%);
 }
 .calendar-button--right {
   position: absolute;
   font-size: 2rem;
-  right: 35%;
+  right: 30%;
   color: #fff;
+  transform: translateY(10%);
 }
 
 .calendar-date button:hover {
@@ -292,10 +293,8 @@ body {
 
 .calendar-weekdays {
   display: flex;
-  gap: 2rem;
-  align-items: center;
+  gap: 2.1rem;
   justify-content: center;
-  padding: 0 2rem;
 }
 
 .calendar-weekdays span {
@@ -307,11 +306,20 @@ body {
 .calendar-day {
   font-size: 1.6rem;
   padding: 1rem;
+  border: none;
+  background-color: #212529;
+  color: #fff;
+  cursor: pointer;
 }
 
 .calendar-day.active {
   background-color: #f76f6a;
-  padding: 1rem;
+  /* padding: 1.5rem; */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 3.6rem;
+  width: 3.6rem;
   border-radius: 50%;
   font-weight: 700;
 }

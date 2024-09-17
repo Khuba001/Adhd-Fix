@@ -1,11 +1,16 @@
 import {
+  add,
   eachDayOfInterval,
   endOfMonth,
   endOfWeek,
   format,
+  getDay,
   getYear,
+  isEqual,
+  parse,
   startOfMonth,
   startOfToday,
+  sub,
 } from "date-fns";
 import { useState } from "react";
 import { FaCaretLeft, FaCaretRight } from "react-icons/fa";
@@ -301,48 +306,69 @@ function TaskListItem({ task, handleCompleteTask, handleRemovingTask }) {
 }
 
 function Actions() {
-  return (
-    <div className="actions">
-      <CalendarDate />
-      <Calendar />
-    </div>
-  );
-}
-function CalendarDate() {
-  let year = getYear(date);
-  let month = date.toDateString().split(" ")[1];
-  return (
-    <div className="calendar-date">
-      <span className="calendar-year">{year}</span>
-      <span className="calendar-month">{month}</span>
-      <button className="calendar-button--left">
-        <FaCaretLeft />
-      </button>
-      <button className="calendar-button--right">
-        <FaCaretRight />
-      </button>
-    </div>
-  );
-}
-
-function Calendar() {
   let today = startOfToday();
   const [selectedDay, setSelectedDay] = useState(today);
+  const [currentMonth, setCurrentMonth] = useState(format(today, "MMM-yyyy"));
 
+  let firstDayCurrentMonth = parse(currentMonth, "MMM-yyyy", new Date());
+
+  function nextMonth() {
+    let firstDayNextMonth = add(firstDayCurrentMonth, { months: 1 });
+    setCurrentMonth(format(firstDayNextMonth, "MMM-yyyy"));
+  }
+
+  function previousMonth() {
+    let firstDayPreviousMonth = sub(firstDayCurrentMonth, { months: 1 });
+    setCurrentMonth(format(firstDayPreviousMonth, "MMM-yyyy"));
+  }
+
+  return (
+    <div className="actions">
+      <CalendarDate
+        today={today}
+        nextMonth={nextMonth}
+        firstDayCurrentMonth={firstDayCurrentMonth}
+        previousMonth={previousMonth}
+      />
+      <Calendar
+        selectedDay={selectedDay}
+        setSelectedDay={setSelectedDay}
+        firstDayCurrentMonth={firstDayCurrentMonth}
+      />
+    </div>
+  );
+}
+function CalendarDate({ nextMonth, firstDayCurrentMonth, previousMonth }) {
+  return (
+    <div className="calendar-date">
+      <span className="calendar-month-year">
+        {format(firstDayCurrentMonth, "MMM yyyy")}
+      </span>
+      <button className="calendar-button--left">
+        <FaCaretLeft onClick={previousMonth} />
+      </button>
+      <button className="calendar-button--right">
+        <FaCaretRight onClick={nextMonth} />
+      </button>
+    </div>
+  );
+}
+
+function Calendar({ firstDayCurrentMonth, selectedDay, setSelectedDay }) {
   let days = eachDayOfInterval({
-    start: startOfMonth(today),
-    end: endOfWeek(endOfMonth(today)),
+    start: firstDayCurrentMonth,
+    end: endOfWeek(endOfMonth(firstDayCurrentMonth)),
   });
 
   return (
     <>
       <div className="calendar-weekdays">
+        <span>S</span>
         <span>M</span>
         <span>T</span>
         <span>W</span>
         <span>T</span>
         <span>F</span>
-        <span>S</span>
         <span>S</span>
       </div>
       <div className="calendar">
@@ -350,8 +376,9 @@ function Calendar() {
           <CalendarDay
             day={day}
             key={i}
-            today={today}
             selectedDay={selectedDay}
+            setSelectedDay={setSelectedDay}
+            className={i === 0 && colStartClasses[getDay(day)]}
           />
         ))}
       </div>
@@ -359,16 +386,28 @@ function Calendar() {
   );
 }
 
-function CalendarDay({ day, today, selectedDay }) {
+function CalendarDay({ day, selectedDay, setSelectedDay, className }) {
+  console.log(className);
   return (
-    <div
+    <button
+      onClick={() => setSelectedDay(day)}
       className={
-        day.getTime() === today.getTime()
+        isEqual(day, selectedDay)
           ? "calendar-day active"
-          : "calendar-day"
+          : `${className} calendar-day`
       }
     >
       {format(day, "d")}
-    </div>
+    </button>
   );
 }
+
+let colStartClasses = [
+  "",
+  "col-start-2",
+  "col-start-3",
+  "col-start-4",
+  "col-start-5",
+  "col-start-6",
+  "col-start-7",
+];
